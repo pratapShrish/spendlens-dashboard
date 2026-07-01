@@ -47,7 +47,7 @@ function sum(items, selector) { return items.reduce((total, item) => total + sel
 function categorySummary() {
   return CATEGORIES.map((category) => {
     const rows = state.expenses.filter((item) => item.category === category);
-    return { category, count: rows.length, total: sum(rows, toUsd), largest: Math.max(...rows.map(toUsd), 0) };
+    return { category, count: rows.length, total: sum(rows, toUsd), largest: Math.max(...rows.map((expense) => toUsd(expense)), 0) };
   }).sort((a, b) => b.total - a.total);
 }
 
