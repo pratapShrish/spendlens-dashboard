@@ -2,7 +2,7 @@
 
 Spendlens turns a supplied set of multi-currency expenses into a finance-ready USD summary. It provides category and merchant rankings, a sortable and filterable ledger, an in-memory expense form, and a live EUR rate scenario tool.
 
-**Live app:** Add the Vercel URL here after deployment.
+**Live app:** [https://spendlens-dashboard-ivory.vercel.app](https://spendlens-dashboard-ivory.vercel.app)
 
 ## Run locally
 
