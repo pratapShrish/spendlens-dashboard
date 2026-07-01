@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Spendlens multi-currency expense dashboard" />
+    <title>Spendlens Expense Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="Spendlens home">
+        <span class="brand-mark" aria-hidden="true">S</span>
+        <span>Spendlens</span>
+      </a>
+      <nav aria-label="Primary navigation">
+        <a href="#dashboard">Dashboard</a>
+        <a href="#expenses">Expenses</a>
+        <a href="#notes">Notes</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">MULTI-CURRENCY EXPENSE INTELLIGENCE</p>
+          <h1 id="page-title">Every expense.<br /><span>One clear picture.</span></h1>
+          <p class="hero-copy">A finance-ready view of company spending across 10 currencies, normalized to USD using the supplied 1 May 2026 rate snapshot.</p>
+        </div>
+        <aside class="rate-card" aria-label="Exchange rate information">
+          <div class="live-dot"><span></span> STATIC SNAPSHOT</div>
+          <p>Rates dated</p>
+          <strong>01 May 2026</strong>
+          <small>Base currency · USD</small>
+        </aside>
+      </section>
+
+      <section id="dashboard" class="section dashboard-section" aria-labelledby="dashboard-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">SUMMARY</p>
+            <h2 id="dashboard-title">Spending at a glance</h2>
+          </div>
+          <p id="active-context" class="context-label">All categories · 20 expenses</p>
+        </div>
+
+        <div class="metric-grid">
+          <article class="metric-card metric-primary">
+            <p>Total spend</p>
+            <strong id="overall-total">—</strong>
+            <span id="total-change" class="change-note">Across all recorded expenses</span>
+          </article>
+          <article class="metric-card">
+            <p>Largest category</p>
+            <strong id="largest-category">—</strong>
+            <span id="largest-category-value">—</span>
+          </article>
+          <article class="metric-card">
+            <p>Largest expense</p>
+            <strong id="largest-expense">—</strong>
+            <span id="largest-expense-merchant">—</span>
+          </article>
+          <article class="metric-card">
+            <p>Currencies tracked</p>
+            <strong id="currency-count">—</strong>
+            <span>One normalized USD view</span>
+          </article>
+        </div>
+
+        <div class="summary-grid">
+          <article class="panel category-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">CATEGORY BREAKDOWN</p>
+                <h3>Where the money goes</h3>
+              </div>
+              <small>Click a row to filter</small>
+            </div>
+            <div class="table-scroll">
+              <table>
+                <thead><tr><th>Category</th><th>Expenses</th><th>Total (USD)</th><th>Largest</th></tr></thead>
+                <tbody id="category-body"></tbody>
+              </table>
+            </div>
+          </article>
+
+          <article class="panel merchants-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">TOP MERCHANTS</p>
+                <h3>Highest spend</h3>
+              </div>
+            </div>
+            <ol id="merchant-list" class="merchant-list"></ol>
+          </article>
+        </div>
+
+        <article class="what-if-panel">
+          <div>
+            <p class="eyebrow">WHAT-IF ANALYSIS</p>
+            <h3>Test a different EUR rate</h3>
+            <p>Adjust EUR units per USD and see the dashboard recalculate instantly.</p>
+          </div>
+          <div class="slider-wrap">
+            <div class="slider-labels"><label for="eur-rate">EUR per USD</label><output id="eur-output" for="eur-rate">0.9201</output></div>
+            <input id="eur-rate" type="range" min="0.80" max="1.10" value="0.9201" step="0.0001" />
+            <div class="range-values"><span>0.80</span><button id="reset-rate" type="button">Reset to 0.9201</button><span>1.10</span></div>
+          </div>
+        </article>
+      </section>
+
+      <section id="expenses" class="section" aria-labelledby="expenses-title">
+        <div class="section-heading expenses-heading">
+          <div>
+            <p class="eyebrow">EXPENSE LEDGER</p>
+            <h2 id="expenses-title">Review every transaction</h2>
+          </div>
+          <button class="primary-button" id="open-form" type="button">+ Add expense</button>
+        </div>
+
+        <div class="toolbar">
+          <div id="category-filters" class="filter-group" aria-label="Filter expenses by category"></div>
+          <div class="sort-controls">
+            <label for="sort-field">Sort by</label>
+            <select id="sort-field"><option value="date">Date</option><option value="usd">USD amount</option></select>
+            <button id="sort-direction" type="button" aria-label="Change sort direction">Newest first ↓</button>
+          </div>
+        </div>
+
+        <div class="panel expense-panel">
+          <div class="table-scroll">
+            <table class="expense-table">
+              <thead><tr><th>Date</th><th>Merchant</th><th>Category</th><th>Original amount</th><th>USD equivalent</th></tr></thead>
+              <tbody id="expense-body"></tbody>
+            </table>
+          </div>
+          <div id="empty-state" class="empty-state" hidden>No expenses match this category.</div>
+          <div class="table-footer"><span id="row-count">—</span><span>Amounts rounded to 2 decimal places</span></div>
+        </div>
+      </section>
+
+      <section id="notes" class="section notes-section" aria-labelledby="notes-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">METHOD &amp; HANDOFF</p>
+            <h2 id="notes-title">How this works</h2>
+          </div>
+        </div>
+        <div class="notes-grid">
+          <article class="panel prose-card">
+            <h3>Currency conversion approach</h3>
+            <p>I keep exchange rates in one lookup object keyed by currency code. Because the supplied snapshot states a USD base, each rate represents how many units of that currency equal one USD. Every expense is normalized with <code>USD = original amount ÷ rate</code>. Summary cards, category totals, merchant rankings and the transaction table all call the same conversion function, so there is one source of truth and no duplicated arithmetic. Values stay at full precision during calculations and are rounded only for display, avoiding cumulative rounding errors.</p>
+            <p>Adding a 25th currency would require only a new rate entry and making that code available in the form; the aggregation logic would not change. In a production version, the supported-currency list would be derived directly from validated rate data so those two steps could not drift apart.</p>
+            <p>A null, missing, zero or non-numeric rate would otherwise produce an invalid or infinite USD value and corrupt every summary. The conversion function therefore rejects the value before division. This prototype prevents an unsupported currency from being submitted; a production system should also quarantine invalid imported rows, show a clear “rate unavailable” state, log the failure, and exclude those rows from totals until finance supplies a valid rate.</p>
+          </article>
+          <article class="panel detail-card">
+            <div><span>Data source</span><strong>20 supplied expenses</strong></div>
+            <div><span>Rate model</span><strong>Static · USD base</strong></div>
+            <div><span>Storage</span><strong>In-memory only</strong></div>
+            <div><span>Prepared by</span><strong>Shrish Pratap</strong></div>
+            <p>For the technical handoff, CEO briefing and edge-case analysis, see the project repository documentation.</p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <dialog id="expense-dialog">
+      <form id="expense-form" novalidate>
+        <div class="dialog-heading"><div><p class="eyebrow">NEW TRANSACTION</p><h2>Add an expense</h2></div><button id="close-form" class="icon-button" type="button" aria-label="Close">×</button></div>
+        <p class="form-intro">It will appear immediately in the ledger and every summary.</p>
+        <div class="form-grid">
+          <label class="full-field">Merchant name<input id="merchant" name="merchant" maxlength="80" required placeholder="e.g. Adobe" /><small class="error" data-for="merchant"></small></label>
+          <label>Amount<input id="amount" name="amount" type="number" min="0.01" step="0.01" required placeholder="0.00" /><small class="error" data-for="amount"></small></label>
+          <label>Currency<select id="currency" name="currency" required></select></label>
+          <label>Category<select id="category" name="category" required></select></label>
+          <label>Date<input id="date" name="date" type="date" required /><small class="error" data-for="date"></small></label>
+        </div>
+        <div id="form-error" class="form-error" role="alert"></div>
+        <div class="dialog-actions"><button id="cancel-form" class="secondary-button" type="button">Cancel</button><button class="primary-button" type="submit">Add expense</button></div>
+      </form>
+    </dialog>
+    <div id="toast" class="toast" role="status" aria-live="polite">Expense added and totals updated.</div>
+    <footer><span>Spendlens product analyst assignment</span><span>Built by Shrish Pratap · 2026</span></footer>
+    <script src="app.js"></script>
+  </body>
+</html>

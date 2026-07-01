@@ -1,0 +1,26 @@
+# Edge-case analysis
+
+The table separates what this prototype does today from the behavior expected in a production finance tool.
+
+| Failure mode | Current handling | Correct production behavior |
+| --- | --- | --- |
+| A rate is `null`, missing, zero or text | The conversion function rejects non-finite and non-positive rates. The form exposes only supplied currencies. | Quarantine the affected row, exclude it from totals, explain which rate is missing, alert an owner and retry after correction. Never silently treat it as zero. |
+| Amount is zero or negative | The add form rejects values at or below zero. | Decide whether refunds and credits are valid business events. If so, model them as typed transactions rather than accepting unexplained negative expenses. |
+| Required form fields are empty | Inline validation blocks submission and identifies the missing merchant, amount or date. | Keep field-level errors, focus the first invalid field and record validation failures for monitoring if they become frequent. |
+| Merchant contains `<`, `&`, quotes, emoji or non-Latin text | User-entered merchant names are inserted through an HTML-escaping function, preventing markup execution while preserving the characters. | Keep output encoding and add server-side validation. Store Unicode faithfully and test search/export with international names. |
+| A malicious merchant contains a script payload | Escaping prevents the payload from becoming active HTML in the ledger or merchant ranking. | Apply contextual output encoding, a strict Content Security Policy and server-side sanitization; add a regression security test. |
+| An amount is extremely large | The table can scroll horizontally and numbers use grouped formatting, but a huge value could still make cards visually awkward or lose precision. | Set documented business limits, use decimal or integer-minor-unit storage, and switch compact displays to an intentional abbreviated format with the exact value available. |
+| Floating-point arithmetic creates fractions of a cent | Full precision is retained and values are rounded only for display, reducing cumulative display-rounding error. JavaScript floating-point limitations remain. | Use a decimal-money library or integer minor units with an explicit rounding policy approved by finance. Reconcile totals against source data. |
+| Filtering returns no rows | A clear empty state appears while the global summary remains visible. | Keep the filter visible, provide a one-click reset and distinguish “no matching rows” from “data failed to load.” |
+| The same merchant appears with different spelling or case | Each spelling is ranked separately, so `AWS` and `Aws` would not combine. | Add a canonical merchant identifier and a reviewable matching rule; never merge merchants invisibly based only on fuzzy text. |
+| Two expenses have the same date or USD value | Modern JavaScript sorting is stable, so their original order is retained, but no secondary rule is shown. | Add an explicit secondary sort (for example date, then transaction ID) so output is deterministic across systems. |
+| A user changes the EUR rate after adding EUR expenses | All EUR rows, category totals, rankings and overall totals recalculate from the current in-memory rate. | Store the scenario separately from booked values, label it clearly as a simulation and prevent it from overwriting historical accounting rates. |
+| The slider label says EUR/USD but the supplied rate uses USD as base | The UI explicitly says “EUR per USD” and uses `USD = EUR amount ÷ rate`, matching the supplied snapshot. | Define rate direction in the data contract and display it unambiguously everywhere. Add a known conversion example as an automated test. |
+| Date changes by one day because of time zones | Date-only strings are parsed and displayed in UTC, so the supplied ledger date remains stable. | Store expense dates as date-only values, not timestamps, unless the business needs transaction time and location. |
+| The page is opened on a narrow phone | Cards stack, controls wrap, tables scroll horizontally and the form becomes one column. | Continue device testing, keep minimum touch-target sizes and consider a card view for ledger rows on very narrow screens. |
+| The user refreshes or opens another browser | Newly added expenses disappear because storage is intentionally in-memory. | Persist data in an authenticated backend, show save status and guard against concurrent edits. |
+| Rates become stale without anyone noticing | The fixed snapshot date is visible at the top of the dashboard. There is no expiry warning. | Define a rate-validity policy, show stale status, retain the historical rate used for each reporting period and require approval before a board report is finalized. |
+
+## Most consequential non-obvious risk
+
+Rate direction is easy to reverse even when every number looks plausible. The supplied object says “base: USD,” meaning `0.9201 EUR` equals `1 USD`; therefore a euro expense must be divided by `0.9201`, not multiplied. A multiplication implementation would understate every non-USD transaction without crashing. The production safeguard should combine an explicit rate schema (`base`, `quote`, `value`) with a test using a known example and a reconciliation total signed off by finance.
